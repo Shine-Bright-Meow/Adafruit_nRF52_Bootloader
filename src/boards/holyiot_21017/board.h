@@ -30,10 +30,11 @@
 /*------------------------------------------------------------------*/
 /* LED
  *------------------------------------------------------------------*/
-#define LEDS_NUMBER       2
-#define LED_PRIMARY_PIN   8 // Red
-#define LED_SECONDARY_PIN 12 // Blue
-#define LED_STATE_ON      0
+#define LEDS_NUMBER        3
+#define LED_PRIMARY_PIN    _PINNUM(1, 9) // Green
+#define LED_SECONDARY_PIN  _PINNUM(0, 8) // Red
+#define LED_TERTIARY_PIN   _PINNUM(0, 12) // Blue
+#define LED_STATE_ON       0
 
 /*------------------------------------------------------------------*/
 /* BUTTON
@@ -53,8 +54,8 @@
 // USB
 //--------------------------------------------------------------------+
 #define USB_DESC_VID           0x1209
-#define USB_DESC_UF2_PID       0x7690
-#define USB_DESC_CDC_ONLY_PID  0x7690
+#define USB_DESC_UF2_PID       0x7691
+#define USB_DESC_CDC_ONLY_PID  0x7691
 
 #define UF2_PRODUCT_NAME  "Holyiot 21017"
 #define UF2_VOLUME_LABEL  "MEOWMEOW"
