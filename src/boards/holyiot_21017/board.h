@@ -30,9 +30,10 @@
 /*------------------------------------------------------------------*/
 /* LED
  *------------------------------------------------------------------*/
-#define LEDS_NUMBER        1
-#define LED_PRIMARY_PIN    _PINNUM(0, 6)
-#define LED_STATE_ON       0
+#define LEDS_NUMBER       2
+#define LED_PRIMARY_PIN   8 // Red
+#define LED_SECONDARY_PIN 12 // Blue
+#define LED_STATE_ON      0
 
 /*------------------------------------------------------------------*/
 /* BUTTON
