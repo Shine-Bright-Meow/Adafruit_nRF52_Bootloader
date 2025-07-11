@@ -34,6 +34,10 @@ set(TINYUSB_DIR ${CMAKE_CURRENT_LIST_DIR}/lib/tinyusb/src)
 set(UF2CONV_PY ${CMAKE_CURRENT_LIST_DIR}/lib/uf2/utils/uf2conv.py)
 set(UF2_FAMILY_ID_BOOTLOADER 0xd663823c)
 
+if (NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+  set(CMAKE_BUILD_TYPE MinSizeRel CACHE STRING "Build type" FORCE)
+endif ()
+
 #-------------------
 # Bootloader
 #-------------------
@@ -131,7 +135,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_include_directories(bootloader PUBLIC
     lib/SEGGER_RTT/RTT
     )
-
   target_compile_definitions(bootloader PUBLIC
     CFG_DEBUG
     SEGGER_RTT_MODE_DEFAULT=SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL
@@ -175,6 +178,7 @@ target_compile_options(bootloader PUBLIC
   )
 target_compile_definitions(bootloader PUBLIC
   SOFTDEVICE_PRESENT
+  CONFIG_GPIO_AS_PINRESET
   )
 
 if (TRACE_ETM STREQUAL "1")
@@ -221,31 +225,28 @@ if (MCU_VARIANT STREQUAL "nrf52")
   set(SD_NAME s132)
   set(DFU_DEV_REV 0xADAF)
   set(DFU_APP_DATA_RESERVED 7*4096)
-  target_compile_definitions(bootloader PUBLIC
-    NRF52
-    NRF52832_XXAA
-    S132
-    )
+  target_compile_definitions(bootloader PUBLIC NRF52 NRF52832_XXAA)
 elseif (MCU_VARIANT STREQUAL "nrf52833")
-  set(SD_NAME s140)
   set(DFU_DEV_REV 52833)
   set(DFU_APP_DATA_RESERVED 7*4096)
-  target_compile_definitions(bootloader PUBLIC
-    NRF52833_XXAA
-    S140
-    )
+  target_compile_definitions(bootloader PUBLIC NRF52833_XXAA)
+  if (NOT DEFINED SD_NAME)
+    set(SD_NAME s140)
+  endif ()
 elseif (MCU_VARIANT STREQUAL "nrf52840")
-  set(SD_NAME s140)
   set(DFU_DEV_REV 52840)
   # App reserved 40KB (8+32) to match circuitpython for 840
   set(DFU_APP_DATA_RESERVED 10*4096)
-  target_compile_definitions(bootloader PUBLIC
-    NRF52840_XXAA
-    S140
-    )
+  target_compile_definitions(bootloader PUBLIC NRF52840_XXAA)
+  if (NOT DEFINED SD_NAME)
+    set(SD_NAME s140)
+  endif ()
 else ()
   message(FATAL_ERROR "MCU_VARIANT ${MCU_VARIANT} is unknown")
 endif ()
+
+string(TOUPPER ${SD_NAME} SD_NAME_UPPER)
+target_compile_definitions(bootloader PUBLIC ${SD_NAME_UPPER})
 
 set(SD_FILENAME ${SD_NAME}_nrf52_${SD_VERSION})
 set(SD_HEX ${SOFTDEVICE_DIR}/${SD_FILENAME}/${SD_FILENAME}_softdevice.hex)
@@ -334,3 +335,10 @@ add_custom_target(flash-mbr
 add_custom_target(flash-erase
   COMMAND ${NRFJPROG} -f nrf52 --eraseall
   )
+
+# flash skip crc magic ( app valid = 0x0001, crc = 0x0000 )
+#add_custom_target(flash-skip-crc
+#  #COMMAND ${NRFJPROG} --memwr $(BOOT_SETTING_ADDR) --val 0x00000001 -f nrf52
+#  COMMAND ${NRFJPROG} --memwr 0xFF000 --val 0x00000001 -f nrf52
+#  #COMMAND ${NRFJPROG} --memwr 0x7F000 --val 0x00000001 -f nrf52
+#  )
