@@ -27,8 +27,6 @@
 
 #define _PINNUM(port, pin)    ((port)*32 + (pin))
 
-#define ENABLE_DCDC_1         1
-
 /*------------------------------------------------------------------*/
 /* LED
  *------------------------------------------------------------------*/
@@ -42,7 +40,7 @@
 /* BUTTON
  *------------------------------------------------------------------*/
 #define BUTTONS_NUMBER        2
-#define BUTTON_1              _PINNUM(0, 18) // unusable: RESET
+#define BUTTON_1              _PINNUM(0, 18)
 #define BUTTON_2              _PINNUM(0, 15)
 #define BUTTON_PULL           NRF_GPIO_PIN_PULLUP
 
